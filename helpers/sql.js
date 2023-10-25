@@ -2,7 +2,13 @@
 
 const { BadRequestError } = require("../expressError");
 
-// THIS NEEDS SOME GREAT DOCUMENTATION.
+/** Helper to build SQL UPDATE SET statement.
+ *
+ * Takes object of col names and updated values and
+ * object of optional JS to SQL col name conversions and
+ * returns parameterized SET statement string and
+ * array of the parameterized values.
+ */
 
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   const keys = Object.keys(dataToUpdate);
