@@ -161,11 +161,8 @@ describe("_sqlForCompaniesWhere", function () {
 
   test("doesn't work: filter by invalid filter", async function () {
     const filters = { invalidFilter: "invalid" };
-    try {
-      Company._sqlForCompaniesWhere(filters);
-    } catch (err) {
-      expect(err instanceof BadRequestError).toBeTruthy();
-    }
+    const response = Company._sqlForCompaniesWhere(filters);
+    expect(response).toEqual({ whereCols: "", values: [] });
   });
 });
 

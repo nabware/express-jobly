@@ -92,22 +92,29 @@ class Company {
     const keys = Object.keys(dataToFilter);
     if (keys.length === 0) return { whereCols: "", values: [] };
 
-    const cols = keys.map((colName, idx) => {
+    const cols = [];
+    let idx = 0;
+
+    for (const colName in dataToFilter) {
       if (colName === "nameLike") {
         dataToFilter[colName] = `%${dataToFilter[colName]}%`;
 
-        return `name ILIKE $${idx + 1}`;
+        cols.push(`name ILIKE $${idx + 1}`);
 
       } else if (colName === "minEmployees") {
-        return `num_employees >= $${idx + 1}`;
+        cols.push(`num_employees >= $${idx + 1}`);
 
       } else if (colName === "maxEmployees") {
-        return `num_employees <= $${idx + 1}`;
+        cols.push(`num_employees <= $${idx + 1}`);
 
       } else {
-        throw new BadRequestError(`Invalid filter: ${colName}`);
+        continue;
       }
-    });
+
+      idx += 1;
+    }
+
+    if (cols.length === 0) return { whereCols: "", values: [] };
 
     return {
       whereCols: "WHERE " + cols.join(" AND "),
