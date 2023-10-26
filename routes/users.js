@@ -28,8 +28,11 @@ const router = express.Router();
  **/
 
 router.post("/", ensureIsAdmin, async function (req, res, next) {
+  const body = req.body;
+  if (body.isAdmin === undefined) body.isAdmin = false;
+
   const validator = jsonschema.validate(
-      req.body,
+    body,
       userNewSchema,
       { required: true },
   );
@@ -38,7 +41,7 @@ router.post("/", ensureIsAdmin, async function (req, res, next) {
     throw new BadRequestError(errs);
   }
 
-  const user = await User.register(req.body);
+  const user = await User.register(body);
   const token = createToken(user);
   return res.status(201).json({ user, token });
 });

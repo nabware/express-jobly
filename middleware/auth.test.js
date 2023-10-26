@@ -6,6 +6,7 @@ const {
   authenticateJWT,
   ensureLoggedIn,
   ensureIsAdmin,
+  ensureIsAdminOrCorrectUser,
 } = require("./auth");
 
 
@@ -49,7 +50,7 @@ describe("authenticateJWT", function () {
 
 
 describe("ensureLoggedIn", function () {
-  test("works", function () {
+  test("works: valid login", function () {
     const req = {};
     const res = { locals: { user: { username: "test" } } };
     ensureLoggedIn(req, res, next);
@@ -71,7 +72,7 @@ describe("ensureLoggedIn", function () {
 });
 
 describe("ensureIsAdmin", function () {
-  test("works", function () {
+  test("works: valid admin login", function () {
     const req = {};
     const res = { locals: { user: { username: "test", isAdmin: true } } };
     ensureIsAdmin(req, res, next);
@@ -88,6 +89,34 @@ describe("ensureIsAdmin", function () {
     const req = {};
     const res = { locals: { user: { } } };
     expect(() => ensureIsAdmin(req, res, next))
+        .toThrow(UnauthorizedError);
+  });
+});
+
+describe("ensureIsAdminOrCorrectUser", function () {
+  test("works: admin login", function () {
+    const req = { params: { username: "test2" } };
+    const res = { locals: { user: { username: "test", isAdmin: true } } };
+    ensureIsAdminOrCorrectUser(req, res, next);
+  });
+
+  test("works: non admin correct user", function () {
+    const req = { params: { username: "test" } };
+    const res = { locals: { user: { username: "test", isAdmin: false } } };
+    ensureIsAdminOrCorrectUser(req, res, next);
+  });
+
+  test("unauth if not admin and incorrect user", function () {
+    const req = { params: { username: "test2" } };
+    const res = { locals: { user: { username: "test", isAdmin: false } } };
+    expect(() => ensureIsAdminOrCorrectUser(req, res, next))
+        .toThrow(UnauthorizedError);
+  });
+
+  test("unauth if no valid login", function () {
+    const req = { params: { username: "test" } };
+    const res = { locals: { user: { } } };
+    expect(() => ensureIsAdminOrCorrectUser(req, res, next))
         .toThrow(UnauthorizedError);
   });
 });
