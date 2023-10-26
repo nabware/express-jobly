@@ -12,4 +12,11 @@ describe("sqlForPartialUpdate", function () {
     expect(setCols).toEqual('"first_name"=$1, "age"=$2');
     expect(values).toEqual(["Aliya", 32]);
   });
+
+  test("doesn't work: not passing jsToSql param", function () {
+    const dataToUpdate = { age: 32 };
+
+    expect(() => sqlForPartialUpdate(dataToUpdate))
+      .toThrow("Cannot read properties of undefined (reading 'age')");
+  });
 });

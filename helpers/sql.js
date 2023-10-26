@@ -8,6 +8,9 @@ const { BadRequestError } = require("../expressError");
  * object of optional JS to SQL col name conversions and
  * returns parameterized SET statement string and
  * array of the parameterized values.
+ *
+ * Input: {firstName: 'Aliya', age: 32}, {firstName: 'first_name'}
+ * Output: {setCols: ['"first_name"=$1, '"age"=$2'], values: ["Aliya", 32]}
  */
 
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {

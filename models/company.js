@@ -38,12 +38,12 @@ class Company {
                     description,
                     num_employees AS "numEmployees",
                     logo_url AS "logoUrl"`, [
-          handle,
-          name,
-          description,
-          numEmployees,
-          logoUrl,
-        ],
+      handle,
+      name,
+      description,
+      numEmployees,
+      logoUrl,
+    ],
     );
     const company = result.rows[0];
 
@@ -55,7 +55,14 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(filters = {}) {
+    if (filters.minEmployees > filters.maxEmployees) {
+      throw new BadRequestError(
+        "Invalid filter: minEmployees cannot be greater than maxEmployees"
+      );
+    }
+    const { whereCols, values } = Company._sqlForCompaniesWhere(filters);
+
     const companiesRes = await db.query(`
         SELECT handle,
                name,
@@ -63,8 +70,49 @@ class Company {
                num_employees AS "numEmployees",
                logo_url      AS "logoUrl"
         FROM companies
-        ORDER BY name`);
+        ${whereCols}
+        ORDER BY name`, values);
     return companiesRes.rows;
+  }
+
+  /** Helper to build SQL WHERE statement for company.
+   *
+   * Takes object of optional filter keys and values and
+   * returns parameterized WHERE statement string and
+   * array of the parameterized values.
+   *
+   * Input: {nameLike: "hall", minEmployees: 3}
+   * Output: {
+   *    whereCols: "WHERE name ILIKE $1 AND num_employees >= $2",
+   *    values: ["%hall%", 3]
+   * }
+   */
+
+  static _sqlForCompaniesWhere(dataToFilter) {
+    const keys = Object.keys(dataToFilter);
+    if (keys.length === 0) return { whereCols: "", values: [] };
+
+    const cols = keys.map((colName, idx) => {
+      if (colName === "nameLike") {
+        dataToFilter[colName] = `%${dataToFilter[colName]}%`;
+
+        return `name ILIKE $${idx + 1}`;
+
+      } else if (colName === "minEmployees") {
+        return `num_employees >= $${idx + 1}`;
+
+      } else if (colName === "maxEmployees") {
+        return `num_employees <= $${idx + 1}`;
+
+      } else {
+        throw new BadRequestError(`Invalid filter: ${colName}`);
+      }
+    });
+
+    return {
+      whereCols: "WHERE " + cols.join(" AND "),
+      values: Object.values(dataToFilter),
+    };
   }
 
   /** Given a company handle, return data about company.
@@ -106,11 +154,11 @@ class Company {
 
   static async update(handle, data) {
     const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {
-          numEmployees: "num_employees",
-          logoUrl: "logo_url",
-        });
+      data,
+      {
+        numEmployees: "num_employees",
+        logoUrl: "logo_url",
+      });
     const handleVarIdx = "$" + (values.length + 1);
 
     const querySql = `
