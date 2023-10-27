@@ -193,6 +193,14 @@ describe("GET /companies/:handle", function () {
         description: "Desc1",
         numEmployees: 1,
         logoUrl: "http://c1.img",
+        jobs: [
+          {
+            id: expect.any(Number),
+            title: "j1",
+            salary: 1,
+            equity: "0.1"
+          }
+        ]
       },
     });
   });
@@ -206,6 +214,7 @@ describe("GET /companies/:handle", function () {
         description: "Desc2",
         numEmployees: 2,
         logoUrl: "http://c2.img",
+        jobs: []
       },
     });
   });
@@ -232,7 +241,7 @@ describe("PATCH /companies/:handle", function () {
         name: "C1-new",
         description: "Desc1",
         numEmployees: 1,
-        logoUrl: "http://c1.img",
+        logoUrl: "http://c1.img"
       },
     });
   });

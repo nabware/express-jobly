@@ -54,7 +54,9 @@ class Job {
    * Returns [{ id, title, salary, equity, companyHandle }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(filters = {}) {
+    const { whereCols, values } = Job._sqlForJobsWhere(filters);
+
     const jobsRes = await db.query(`
         SELECT id,
                title,
@@ -62,7 +64,8 @@ class Job {
                equity,
                company_handle AS "companyHandle"
         FROM jobs
-        ORDER BY title`);
+        ${whereCols}
+        ORDER BY title`, values);
     return jobsRes.rows;
   }
 
@@ -72,46 +75,48 @@ class Job {
    * returns parameterized WHERE statement string and
    * array of the parameterized values.
    *
-   * Input: {nameLike: "hall", minEmployees: 3}
+   * Input: {title: "software engineer", minSalary: 140000}
    * Output: {
-   *    whereCols: "WHERE name ILIKE $1 AND num_employees >= $2",
-   *    values: ["%hall%", 3]
+   *    whereCols: "WHERE title ILIKE $1 AND salary >= $2",
+   *    values: ["%software engineer%", 140000]
    * }
    */
 
-  // static _sqlForJobsWhere(dataToFilter) {
-  //   const keys = Object.keys(dataToFilter);
-  //   if (keys.length === 0) return { whereCols: "", values: [] };
+  static _sqlForJobsWhere(dataToFilter) {
+    const keys = Object.keys(dataToFilter);
+    if (keys.length === 0) return { whereCols: "", values: [] };
 
-  //   const cols = [];
-  //   let idx = 0;
+    const cols = [];
+    let idx = 0;
 
-  //   for (const colName in dataToFilter) {
-  //     if (colName === "nameLike") {
-  //       dataToFilter[colName] = `%${dataToFilter[colName]}%`;
+    for (const colName in dataToFilter) {
+      if (colName === "title") {
+        dataToFilter[colName] = `%${dataToFilter[colName]}%`;
 
-  //       cols.push(`name ILIKE $${idx + 1}`);
+        cols.push(`title ILIKE $${idx + 1}`);
 
-  //     } else if (colName === "minEmployees") {
-  //       cols.push(`num_employees >= $${idx + 1}`);
+      } else if (colName === "minSalary") {
+        cols.push(`salary >= $${idx + 1}`);
 
-  //     } else if (colName === "maxEmployees") {
-  //       cols.push(`num_employees <= $${idx + 1}`);
+      } else if (colName === "hasEquity") {
+        dataToFilter[colName] = 0;
 
-  //     } else {
-  //       continue;
-  //     }
+        cols.push(`equity > $${idx + 1}`);
 
-  //     idx += 1;
-  //   }
+      } else {
+        continue;
+      }
 
-  //   if (cols.length === 0) return { whereCols: "", values: [] };
+      idx += 1;
+    }
 
-  //   return {
-  //     whereCols: "WHERE " + cols.join(" AND "),
-  //     values: Object.values(dataToFilter),
-  //   };
-  // }
+    if (cols.length === 0) return { whereCols: "", values: [] };
+
+    return {
+      whereCols: "WHERE " + cols.join(" AND "),
+      values: Object.values(dataToFilter),
+    };
+  }
 
   /** Given a job id, return data about job.
    *

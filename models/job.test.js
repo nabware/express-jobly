@@ -18,6 +18,8 @@ afterAll(commonAfterAll);
 let j1Id;
 
 beforeEach(async () => {
+  await db.query("DELETE FROM jobs");
+
   const jobsResponse = await db.query(`
   INSERT INTO jobs(title,
                     salary,
@@ -28,10 +30,6 @@ beforeEach(async () => {
   );
 
   j1Id = jobsResponse.rows[0].id;
-});
-
-afterEach(async () => {
-  await db.query("DELETE FROM jobs");
 });
 
 /************************************** create */
@@ -89,85 +87,85 @@ describe("findAll", function () {
     ]);
   });
 
-  // test("works: filter by name", async function () {
-  //   const filters = { nameLike: "C1" };
-  //   let jobs = await Job.findAll(filters);
-  //   expect(jobs).toEqual([
-  //     {
-  //       handle: "c1",
-  //       name: "C1",
-  //       description: "Desc1",
-  //       numEmployees: 1,
-  //       logoUrl: "http://c1.img",
-  //     }
-  //   ]);
-  // });
+  test("works: filter by title", async function () {
+    const filters = { title: "j1" };
+    let jobs = await Job.findAll(filters);
+    expect(jobs).toEqual([
+      {
+        id: j1Id,
+        title: "j1",
+        salary: 1,
+        equity: "0.1",
+        companyHandle: "c1"
+      }
+    ]);
+  });
 
-  // test("works: filter by minEmployees", async function () {
-  //   const filters = { minEmployees: 3 };
-  //   let jobs = await Job.findAll(filters);
-  //   expect(jobs).toEqual([
-  //     {
-  //       handle: "c3",
-  //       name: "C3",
-  //       description: "Desc3",
-  //       numEmployees: 3,
-  //       logoUrl: "http://c3.img",
-  //     }
-  //   ]);
-  // });
+  test("works: filter by minSalary", async function () {
+    const filters = { minSalary: 1 };
+    let jobs = await Job.findAll(filters);
+    expect(jobs).toEqual([
+      {
+        id: j1Id,
+        title: "j1",
+        salary: 1,
+        equity: "0.1",
+        companyHandle: "c1"
+      }
+    ]);
+  });
 
-  // test("works: filter by name and maxEmployees", async function () {
-  //   const filters = { nameLike: "c2", maxEmployees: 2 };
-  //   let jobs = await Job.findAll(filters);
-  //   expect(jobs).toEqual([
-  //     {
-  //       handle: "c2",
-  //       name: "C2",
-  //       description: "Desc2",
-  //       numEmployees: 2,
-  //       logoUrl: "http://c2.img",
-  //     },
-  //   ]);
-  // });
+  test("works: filter by hasEquity", async function () {
+    const filters = { hasEquity: true };
+    let jobs = await Job.findAll(filters);
+    expect(jobs).toEqual([
+      {
+        id: j1Id,
+        title: "j1",
+        salary: 1,
+        equity: "0.1",
+        companyHandle: "c1"
+      },
+    ]);
+  });
 
-  // test("doesn't work: filter by minEmployees greater than maxEmployees", async function () {
-  //   const filters = { minEmployees: 3, maxEmployees: 2 };
-  //   try {
-  //     await Job.findAll(filters);
-  //   } catch (err) {
-  //     expect(err instanceof BadRequestError).toBeTruthy();
-  //   }
-  // });
+  test("doesn't work: filter by minSalary less than 0", async function () {
+    const filters = { minSalary: -1 };
+    try {
+      await Job.findAll(filters);
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
 
-  // test("doesn't work: filter by invalid filter", async function () {
-  //   const filters = { invalidFilter: "invalid" };
-  //   try {
-  //     await Job.findAll(filters);
-  //   } catch (err) {
-  //     expect(err instanceof BadRequestError).toBeTruthy();
-  //   }
-  // });
+  test("doesn't work: filter by invalid filter", async function () {
+    const filters = { invalidFilter: "invalid" };
+    try {
+      await Job.findAll(filters);
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
 });
 
-// /************************************** _sqlForJobsWhere */
+/************************************** _sqlForJobsWhere */
 
-// describe("_sqlForJobsWhere", function () {
-//   test("works", async function () {
-//     const filters = { nameLike: "hall", minEmployees: 3 };
-//     const response = Job._sqlForJobsWhere(filters);
-//     expect(response).toEqual({
-//       whereCols: "WHERE name ILIKE $1 AND num_employees >= $2",
-//       values: ["%hall%", 3]
-//     });
-//   });
+describe("_sqlForJobsWhere", function () {
+  test("works", async function () {
+    const filters = { title: "j1", minSalary: 1 };
+    const response = Job._sqlForJobsWhere(filters);
+    expect(response).toEqual({
+      whereCols: "WHERE title ILIKE $1 AND salary >= $2",
+      values: ["%j1%", 1]
+    });
+  });
 
-//   test("doesn't work: filter by invalid filter", async function () {
-//     const filters = { invalidFilter: "invalid" };
-//     const response = Job._sqlForJobsWhere(filters);
-//     expect(response).toEqual({ whereCols: "", values: [] });
-//   });
-// });
+  test("doesn't work: filter by invalid filter", async function () {
+    const filters = { invalidFilter: "invalid" };
+    const response = Job._sqlForJobsWhere(filters);
+    expect(response).toEqual({ whereCols: "", values: [] });
+  });
+});
 
 /************************************** get */
 
