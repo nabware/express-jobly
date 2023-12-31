@@ -26,7 +26,7 @@ Jobly is a full stack web application of a mock job board site where users can c
 ![alt text](https://img.shields.io/badge/-Node.js-339933?logo=node.js&logoColor=white&style=for-the-badge)
 ![alt text](https://img.shields.io/badge/-PostgresSQL-4169E1?logo=postgresql&logoColor=white&style=for-the-badge)
 
-### Frontend ([GitHub Repo](https://github.com/amathew195/react-jobly)):
+### Frontend ([GitHub Repo](https://github.com/nabware/react-jobly)):
 ![alt text](https://img.shields.io/badge/-ReactJs-61DAFB?logo=react&logoColor=white&style=for-the-badge)
 
 ## Install<a name="Install"></a>
