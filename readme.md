@@ -6,17 +6,13 @@ Jobly is a full stack web application of a mock job board site where users can c
 1. [Features](#Features)
 2. [Tech stack](#Tech-stack)
 3. [Install](#Install)
-4. [Testing](#Testing)
-5. [Deployment](#Deployment)
+4. [Deployment](#Deployment)
 
 ## Features<a name="Features"></a>
 * Utilizes RESTful API
-* Users must create an account to access the application. A valid email is not required, but passwords are hashed and authenticated using bcrypt. 
-* Proper authorization checks are in place to ensure admin position can complete additional activities (ex. creating, updating, and deleting companies) and regular users cannot.  
+* Users must create an account to access the application. Passwords are hashed and authenticated using bcrypt. 
 * Users can browse through library of companies and/or jobs with the option to filter using the search bar. 
-* "Apply" feature allows users to keep track of which jobs they have already applied for. 
-* Users can update their profile, but cannot change their username. 
-* Getting information on a user, updating, or deleting a user is only permitted by either an admin, or by that user.
+* Users can update their profile.
 
 ## Tech stack<a name="Tech-stack"></a>
 
