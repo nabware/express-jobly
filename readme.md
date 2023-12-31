@@ -18,14 +18,14 @@ Jobly is a full stack web application of a mock job board site where users can c
 * Users can update their profile, but cannot change their username. 
 * Getting information on a user, updating, or deleting a user is only permitted by either an admin, or by that user.
 
-## Tech stack<a name="Tech-stack"></a>: 
+## Tech stack<a name="Tech-stack"></a>
 
 ### Backend
 ![alt text](https://img.shields.io/badge/-Express-000000?logo=express&logoColor=white&style=for-the-badge)
 ![alt text](https://img.shields.io/badge/-Node.js-339933?logo=node.js&logoColor=white&style=for-the-badge)
 ![alt text](https://img.shields.io/badge/-PostgresSQL-4169E1?logo=postgresql&logoColor=white&style=for-the-badge)
 
-### Frontend ([GitHub Repo](https://github.com/nabware/react-jobly)):
+### Frontend ([GitHub Repo](https://github.com/nabware/react-jobly))
 ![alt text](https://img.shields.io/badge/-ReactJs-61DAFB?logo=react&logoColor=white&style=for-the-badge)
 
 ## Install<a name="Install"></a>
@@ -40,13 +40,6 @@ This project uses Node.js for the back-end JavaScript runtime environment. To in
 To start the sever (port 3001):
 
     npm start
-
-## Testing<a name="Testing"></a>:
-To run the tests:
-
-    jest -i
-    
-Note: Any time you run our tests here, you will need to use the -i flag for Jest, so that the tests run “in band” (in order, not at the same time)
 
 ## Deployment<a name="Deployment"></a>
 ### Backend Deployment
